@@ -1,0 +1,13 @@
+{
+  "name": "ketingdongle",
+  "version": "1.0.0",
+  "description": "课听懂了 - 课堂学习助手",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}
