@@ -501,14 +501,19 @@ sampleAudioBtn.addEventListener('click', () => {
 });
 
 transcribeBtn.addEventListener('click', async () => {
-    if (!currentAudioFile || !currentAudioFile.type) {
+    if (!currentAudioFile) return;
+    
+    // 判断是否为真实上传的文件（示例录音是普通对象，不是File实例）
+    const isRealFile = currentAudioFile instanceof File;
+    
+    if (!isRealFile) {
         await simulateTranscription();
         return;
     }
     
     try {
         audioProgress.style.width = '10%';
-        audioProgressText.textContent = '正在上传音频...';
+        audioProgressText.textContent = '正在上传音频到MiMo识别...';
         
         const transcript = await transcribeWithMiMo(currentAudioFile);
         
