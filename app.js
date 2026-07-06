@@ -199,7 +199,9 @@ let state = {
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 function getApiKey() {
-    return localStorage.getItem('deepseek_api_key') || '';
+    // Demo 默认 Key，可直接使用
+    const DEFAULT_KEY = 'sk-561e50b42ca54ff99a828a43b0cb48a5';
+    return localStorage.getItem('deepseek_api_key') || DEFAULT_KEY;
 }
 
 function setApiKey(key) {
