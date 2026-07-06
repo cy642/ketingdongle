@@ -117,19 +117,17 @@
 
                 <div class="audio-input-area" id="audioInputArea" style="display: none;">
                     <div class="input-toolbar">
-                        <span class="toolbar-hint">🎤 支持 MP3、WAV、M4A 等常见音频格式</span>
+                        <span class="toolbar-hint">🎤 仅支持 MP3、WAV 格式（MiMo API 限制）</span>
                         <button class="toolbar-btn" id="sampleAudioBtn">使用示例录音</button>
                     </div>
                     <div class="audio-drop-zone" id="audioDropZone">
-                        <input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
+                        <input type="file" id="audioFileInput" accept=".mp3,.wav,audio/mpeg,audio/mp3,audio/wav" style="display: none;">
                         <div class="drop-icon">🎵</div>
                         <h3 class="drop-title">拖拽音频文件到这里</h3>
                         <p class="drop-desc">或者点击选择文件</p>
                         <div class="drop-formats">
                             <span class="format-tag">MP3</span>
                             <span class="format-tag">WAV</span>
-                            <span class="format-tag">M4A</span>
-                            <span class="format-tag">OGG</span>
                         </div>
                     </div>
                     <div class="audio-preview" id="audioPreview" style="display: none;">

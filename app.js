@@ -493,12 +493,23 @@ audioDropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     audioDropZone.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('audio/')) {
+    if (file && isValidAudioFormat(file)) {
         handleAudioFile(file);
     }
 });
 
+function isValidAudioFormat(file) {
+    const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav'];
+    const validExtensions = ['.mp3', '.wav'];
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+    return validTypes.includes(file.type) || validExtensions.includes(ext);
+}
+
 function handleAudioFile(file) {
+    if (!isValidAudioFormat(file)) {
+        alert('仅支持 MP3 和 WAV 格式的音频文件，请重新选择');
+        return;
+    }
     currentAudioFile = file;
     previewFilename.textContent = file.name;
     audioPreview.style.display = '';
