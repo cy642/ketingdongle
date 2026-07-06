@@ -666,6 +666,9 @@ async function generateNotes() {
         state.notes = JSON.parse(JSON.stringify(SAMPLE_NOTES));
     }
     
+    // 更新笔记标题
+    document.getElementById('notesTitle').textContent = state.notes?.title || '课堂笔记';
+    
     renderNotes();
     renderTOC();
     renderKnowledgeGraph();
