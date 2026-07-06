@@ -197,11 +197,70 @@ let state = {
 };
 
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions';
+const MIMO_ASR_MODEL = 'mimo-v2.5-asr';
 
 function getApiKey() {
-    // Demo 默认 Key，可直接使用
     const DEFAULT_KEY = 'sk-561e50b42ca54ff99a828a43b0cb48a5';
     return localStorage.getItem('deepseek_api_key') || DEFAULT_KEY;
+}
+
+function getMimoApiKey() {
+    const DEFAULT_MIMO_KEY = 'sk-cgzc2besysjxayg8qxd2wiq3882rugdi4uum8jgazit2i6po';
+    return localStorage.getItem('mimo_api_key') || DEFAULT_MIMO_KEY;
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function transcribeWithMiMo(audioFile) {
+    const apiKey = getMimoApiKey();
+    if (!apiKey) {
+        throw new Error('NO_MIMO_API_KEY');
+    }
+
+    const base64Data = await fileToBase64(audioFile);
+    
+    const response = await fetch(MIMO_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'api-key': apiKey
+        },
+        body: JSON.stringify({
+            model: MIMO_ASR_MODEL,
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        {
+                            type: 'input_audio',
+                            input_audio: {
+                                data: base64Data
+                            }
+                        }
+                    ]
+                }
+            ],
+            asr_options: {
+                language: 'zh'
+            }
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`MIMO_API_ERROR:${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
 }
 
 async function callDeepSeek(text, courseName, teacherName) {
@@ -441,11 +500,38 @@ sampleAudioBtn.addEventListener('click', () => {
     handleAudioFile(mockFile);
 });
 
-transcribeBtn.addEventListener('click', () => {
-    simulateTranscription();
+transcribeBtn.addEventListener('click', async () => {
+    if (!currentAudioFile || !currentAudioFile.type) {
+        await simulateTranscription();
+        return;
+    }
+    
+    try {
+        audioProgress.style.width = '10%';
+        audioProgressText.textContent = '正在上传音频...';
+        
+        const transcript = await transcribeWithMiMo(currentAudioFile);
+        
+        audioProgress.style.width = '100%';
+        audioProgressText.textContent = '转写完成！';
+        
+        setTimeout(async () => {
+            lectureText.value = transcript;
+            updateCharCount();
+            await showProcessingAndGenerate();
+        }, 500);
+    } catch (error) {
+        console.warn('MiMo转写失败，使用示例数据:', error);
+        audioProgressText.textContent = '转写失败，使用示例数据...';
+        setTimeout(async () => {
+            lectureText.value = SAMPLE_TEXT;
+            updateCharCount();
+            await showProcessingAndGenerate();
+        }, 1000);
+    }
 });
 
-function simulateTranscription() {
+async function simulateTranscription() {
     const progressSteps = [
         { percent: 20, text: '正在上传音频...' },
         { percent: 40, text: '正在识别语音...' },
