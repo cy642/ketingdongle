@@ -33,29 +33,8 @@
         </div>
         <div class="nav-meta">
             <span class="course-tag" id="courseTag">未命名课程</span>
-            <button class="api-key-btn" id="apiKeyBtn" title="设置 DeepSeek API Key">⚙</button>
         </div>
     </nav>
-
-    <div class="api-key-modal" id="apiKeyModal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>设置 DeepSeek API Key</h2>
-                <button class="modal-close" id="modalClose">✕</button>
-            </div>
-            <div class="modal-body">
-                <p class="modal-desc">输入你的 DeepSeek API Key，用于AI生成笔记。Key只保存在你的浏览器本地，不会上传。</p>
-                <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-xxxxxxxxxxxxxxxx">
-                <p class="modal-hint">没有Key？<a href="https://platform.deepseek.com/api_keys" target="_blank">点击这里获取</a></p>
-                <div class="modal-status" id="modalStatus"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn cancel" id="modalCancel">取消</button>
-                <button class="modal-btn save" id="modalSave">保存</button>
-            </div>
-        </div>
-    </div>
 
     <main class="app-container">
         <section class="view view-home active" id="view-home">

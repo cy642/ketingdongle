@@ -204,60 +204,6 @@ function getApiKey() {
     return localStorage.getItem('deepseek_api_key') || DEFAULT_KEY;
 }
 
-function setApiKey(key) {
-    localStorage.setItem('deepseek_api_key', key);
-}
-
-const apiKeyBtn = document.getElementById('apiKeyBtn');
-const apiKeyModal = document.getElementById('apiKeyModal');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const modalStatus = document.getElementById('modalStatus');
-
-function updateApiKeyBtnStatus() {
-    if (getApiKey()) {
-        apiKeyBtn.classList.add('configured');
-        apiKeyBtn.title = 'DeepSeek API Key 已配置';
-    } else {
-        apiKeyBtn.classList.remove('configured');
-        apiKeyBtn.title = '设置 DeepSeek API Key';
-    }
-}
-
-apiKeyBtn.addEventListener('click', () => {
-    apiKeyInput.value = getApiKey();
-    modalStatus.textContent = '';
-    modalStatus.className = 'modal-status';
-    apiKeyModal.classList.add('active');
-});
-
-document.querySelector('.modal-overlay').addEventListener('click', () => {
-    apiKeyModal.classList.remove('active');
-});
-document.getElementById('modalClose').addEventListener('click', () => {
-    apiKeyModal.classList.remove('active');
-});
-document.getElementById('modalCancel').addEventListener('click', () => {
-    apiKeyModal.classList.remove('active');
-});
-
-document.getElementById('modalSave').addEventListener('click', () => {
-    const key = apiKeyInput.value.trim();
-    if (!key) {
-        modalStatus.textContent = '请输入 API Key';
-        modalStatus.className = 'modal-status error';
-        return;
-    }
-    setApiKey(key);
-    updateApiKeyBtnStatus();
-    modalStatus.textContent = '保存成功！';
-    modalStatus.className = 'modal-status success';
-    setTimeout(() => {
-        apiKeyModal.classList.remove('active');
-    }, 800);
-});
-
-updateApiKeyBtnStatus();
-
 async function callDeepSeek(text, courseName, teacherName) {
     const apiKey = getApiKey();
     if (!apiKey) {
