@@ -545,14 +545,13 @@ transcribeBtn.addEventListener('click', async () => {
             await showProcessingAndGenerate();
         }, 500);
     } catch (error) {
-        console.error('MiMo转写失败:', error);
-        const errorMsg = error.message || '未知错误';
-        audioProgressText.textContent = `转写失败：${errorMsg.slice(0, 60)}...`;
+        console.warn('MiMo转写失败，使用示例数据:', error);
+        audioProgressText.textContent = '转写失败，使用示例数据...';
         setTimeout(async () => {
             lectureText.value = SAMPLE_TEXT;
             updateCharCount();
             await showProcessingAndGenerate();
-        }, 2000);
+        }, 1000);
     }
 });
 
