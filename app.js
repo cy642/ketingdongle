@@ -227,40 +227,59 @@ async function transcribeWithMiMo(audioFile) {
 
     const base64Data = await fileToBase64(audioFile);
     
-    const response = await fetch(MIMO_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'api-key': apiKey
-        },
-        body: JSON.stringify({
-            model: MIMO_ASR_MODEL,
-            messages: [
-                {
-                    role: 'user',
-                    content: [
+    // 尝试两种认证方式
+    const authHeaders = [
+        { 'api-key': apiKey },
+        { 'Authorization': `Bearer ${apiKey}` }
+    ];
+    
+    let lastError = null;
+    
+    for (const headers of authHeaders) {
+        try {
+            const response = await fetch(MIMO_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...headers
+                },
+                body: JSON.stringify({
+                    model: MIMO_ASR_MODEL,
+                    messages: [
                         {
-                            type: 'input_audio',
-                            input_audio: {
-                                data: base64Data
-                            }
+                            role: 'user',
+                            content: [
+                                {
+                                    type: 'input_audio',
+                                    input_audio: {
+                                        data: base64Data
+                                    }
+                                }
+                            ]
                         }
-                    ]
-                }
-            ],
-            asr_options: {
-                language: 'zh'
+                    ],
+                    asr_options: {
+                        language: 'zh'
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                lastError = new Error(`HTTP ${response.status}: ${errorText.slice(0, 200)}`);
+                continue;
             }
-        })
-    });
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`MIMO_API_ERROR:${response.status} - ${errorText}`);
+            const data = await response.json();
+            return data.choices[0].message.content;
+        } catch (e) {
+            lastError = e;
+            // CORS错误或网络错误，继续下一种方式
+            console.warn('认证方式失败:', e.message);
+        }
     }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
+    
+    throw lastError || new Error('所有认证方式均失败');
 }
 
 async function callDeepSeek(text, courseName, teacherName) {
@@ -526,13 +545,14 @@ transcribeBtn.addEventListener('click', async () => {
             await showProcessingAndGenerate();
         }, 500);
     } catch (error) {
-        console.warn('MiMo转写失败，使用示例数据:', error);
-        audioProgressText.textContent = '转写失败，使用示例数据...';
+        console.error('MiMo转写失败:', error);
+        const errorMsg = error.message || '未知错误';
+        audioProgressText.textContent = `转写失败：${errorMsg.slice(0, 60)}...`;
         setTimeout(async () => {
             lectureText.value = SAMPLE_TEXT;
             updateCharCount();
             await showProcessingAndGenerate();
-        }, 1000);
+        }, 2000);
     }
 });
 
