@@ -822,9 +822,6 @@ document.addEventListener('click', (e) => {
     if (e.target.id === 'goNotesBtn') {
         switchView('notes');
     }
-    if (e.target.id === 'backHomeBtn') {
-        switchView('home');
-    }
 });
 
 const flashcard = document.getElementById('flashcard');
